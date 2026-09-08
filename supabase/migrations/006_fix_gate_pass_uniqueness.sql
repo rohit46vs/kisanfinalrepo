@@ -161,4 +161,4 @@ REVOKE ALL ON FUNCTION public.book_slot_v2(uuid, numeric)
 FROM PUBLIC, anon;
 
 GRANT EXECUTE ON FUNCTION public.book_slot_v2(uuid, numeric)
-TO authenticated;
+TO authenticated;   
