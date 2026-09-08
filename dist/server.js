@@ -7,6 +7,10 @@ require("dotenv/config");
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const helmet_1 = __importDefault(require("helmet"));
+const test_routes_1 = __importDefault(require("./routes/test.routes"));
+const centre_routes_1 = __importDefault(require("./routes/centre.routes"));
+const slot_routes_1 = __importDefault(require("./routes/slot.routes"));
+const booking_routes_1 = __importDefault(require("./routes/booking.routes"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const rateLimit_1 = require("./middleware/rateLimit");
 const requestId_1 = require("./middleware/requestId");
@@ -17,10 +21,7 @@ app.disable("x-powered-by");
 app.use((0, helmet_1.default)());
 app.use(requestId_1.requestId);
 app.use((0, cors_1.default)({
-    origin: [
-        "http://localhost:3000",
-        "http://localhost:3001",
-    ],
+    origin: ["http://localhost:3000", "http://localhost:3001"],
     credentials: true,
 }));
 app.use(express_1.default.json({
@@ -36,6 +37,10 @@ app.get("/health", (_req, res) => {
     });
 });
 app.use("/api/auth", rateLimit_1.authRateLimiter, auth_routes_1.default);
+app.use("/api/test", test_routes_1.default);
+app.use("/api/centres", centre_routes_1.default);
+app.use("/api/slots", slot_routes_1.default);
+app.use("/api/bookings", booking_routes_1.default);
 app.use(errorHandler_1.notFoundHandler);
 app.use(errorHandler_1.errorHandler);
 app.listen(PORT, () => {

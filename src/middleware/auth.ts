@@ -3,9 +3,10 @@ import { supabaseAdmin } from "../config/supabase";
 
 export interface AuthenticatedRequest extends Request {
   userId?: string;
-  userEmail?: string;
+  userEmail?: string | undefined;
+  userRole?: string | undefined;
+  accessToken?: string | undefined;
 }
-
 export async function requireAuth(
   req: AuthenticatedRequest,
   res: Response,
@@ -43,7 +44,8 @@ export async function requireAuth(
     }
 
     req.userId = user.id;
-    req.userEmail = user.email;
+req.userEmail = user.email;
+req.accessToken = token;
 
     return next();
   } catch (error) {

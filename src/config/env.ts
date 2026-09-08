@@ -6,9 +6,13 @@ const envSchema = z.object({
 
   SUPABASE_URL: z.string().url(),
 
-  SUPABASE_SERVICE_ROLE_KEY: z
+  SUPABASE_PUBLISHABLE_KEY: z
     .string()
-    .min(1, "SUPABASE_SERVICE_ROLE_KEY is required"),
+    .min(1, "SUPABASE_PUBLISHABLE_KEY is required"),
+
+  SUPABASE_SECRET_KEY: z
+    .string()
+    .min(1, "SUPABASE_SECRET_KEY is required"),
 });
 
 const parsed = envSchema.safeParse(process.env);

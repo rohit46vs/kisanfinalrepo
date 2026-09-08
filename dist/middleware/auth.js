@@ -27,6 +27,7 @@ async function requireAuth(req, res, next) {
         }
         req.userId = user.id;
         req.userEmail = user.email;
+        req.accessToken = token;
         return next();
     }
     catch (error) {
