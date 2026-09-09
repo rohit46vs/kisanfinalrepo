@@ -1,7 +1,11 @@
 import type { Response } from "express";
 import type { AuthenticatedRequest } from "../middleware/auth";
 import { createBookingSchema } from "../validators/booking.validator";
-import { createBooking } from "../services/booking.service";
+import {
+  createBooking,
+  getMyBooking,
+  getBookingById,
+} from "../services/booking.service";
 
 export async function postBooking(
   req: AuthenticatedRequest,
@@ -14,9 +18,7 @@ export async function postBooking(
     });
   }
 
-  const parsed = createBookingSchema.safeParse(
-    req.body
-  );
+  const parsed = createBookingSchema.safeParse(req.body);
 
   if (!parsed.success) {
     return res.status(400).json({
@@ -55,7 +57,8 @@ export async function postBooking(
     if (message.includes("DUPLICATE_BOOKING")) {
       return res.status(409).json({
         success: false,
-        error: "You already have a booking for this slot",
+        error:
+          "You already have a booking for this slot",
       });
     }
 
@@ -76,7 +79,8 @@ export async function postBooking(
     if (message.includes("SLOT_DATE_PASSED")) {
       return res.status(409).json({
         success: false,
-        error: "This slot date has already passed",
+        error:
+          "This slot date has already passed",
       });
     }
 
@@ -102,6 +106,91 @@ export async function postBooking(
     return res.status(500).json({
       success: false,
       error: "Unable to create booking",
+    });
+  }
+}
+
+export async function getMyBookingController(
+  req: AuthenticatedRequest,
+  res: Response
+) {
+  if (!req.accessToken) {
+    return res.status(401).json({
+      success: false,
+      error: "Authentication required",
+    });
+  }
+
+  try {
+    const booking = await getMyBooking(
+      req.accessToken
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: booking,
+    });
+  } catch (error: unknown) {
+    console.error(
+      "Get my booking error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      error: "Unable to load booking",
+    });
+  }
+}
+
+export async function getBookingByIdController(
+  req: AuthenticatedRequest,
+  res: Response
+) {
+  if (!req.accessToken) {
+    return res.status(401).json({
+      success: false,
+      error: "Authentication required",
+    });
+  }
+
+  const bookingId = Array.isArray(req.params.id)
+  ? req.params.id[0]
+  : req.params.id;
+
+if (!bookingId) {
+  return res.status(400).json({
+    success: false,
+    error: "Booking ID is required",
+  });
+}
+
+  try {
+    const booking = await getBookingById(
+      req.accessToken,
+      bookingId
+    );
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        error: "Booking not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: booking,
+    });
+  } catch (error) {
+    console.error(
+      "Get booking by ID error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      error: "Unable to load booking",
     });
   }
 }

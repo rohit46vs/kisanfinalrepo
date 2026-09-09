@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.postBooking = postBooking;
+exports.getMyBookingController = getMyBookingController;
+exports.getBookingByIdController = getBookingByIdController;
 const booking_validator_1 = require("../validators/booking.validator");
 const booking_service_1 = require("../services/booking.service");
 async function postBooking(req, res) {
@@ -77,6 +79,65 @@ async function postBooking(req, res) {
         return res.status(500).json({
             success: false,
             error: "Unable to create booking",
+        });
+    }
+}
+async function getMyBookingController(req, res) {
+    if (!req.accessToken) {
+        return res.status(401).json({
+            success: false,
+            error: "Authentication required",
+        });
+    }
+    try {
+        const booking = await (0, booking_service_1.getMyBooking)(req.accessToken);
+        return res.status(200).json({
+            success: true,
+            data: booking,
+        });
+    }
+    catch (error) {
+        console.error("Get my booking error:", error);
+        return res.status(500).json({
+            success: false,
+            error: "Unable to load booking",
+        });
+    }
+}
+async function getBookingByIdController(req, res) {
+    if (!req.accessToken) {
+        return res.status(401).json({
+            success: false,
+            error: "Authentication required",
+        });
+    }
+    const bookingId = Array.isArray(req.params.id)
+        ? req.params.id[0]
+        : req.params.id;
+    if (!bookingId) {
+        return res.status(400).json({
+            success: false,
+            error: "Booking ID is required",
+        });
+    }
+    try {
+        const booking = await (0, booking_service_1.getBookingById)(req.accessToken, bookingId);
+        if (!booking) {
+            return res.status(404).json({
+                success: false,
+                error: "Booking not found",
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            data: booking,
+        });
+    }
+    catch (error) {
+        console.error("Get booking by ID error:", error);
+        return res.status(500).json({
+            success: false,
+            error: "Unable to load booking",
         });
     }
 }

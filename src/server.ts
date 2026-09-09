@@ -10,6 +10,8 @@ import authRoutes from "./routes/auth.routes";
 import { apiRateLimiter, authRateLimiter } from "./middleware/rateLimit";
 import { requestId } from "./middleware/requestId";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
+import queueRoutes from "./routes/queue.routes";
+import adminQueueRoutes from "./routes/adminQueue.routes";
 
 const app = express();
 
@@ -50,7 +52,11 @@ app.use("/api/test", testRoutes);
 app.use("/api/centres", centreRoutes);
 app.use("/api/slots", slotRoutes);
 app.use("/api/bookings", bookingRoutes);
-
+app.use("/api/queue", queueRoutes); 
+app.use(
+  "/api/admin/queue",
+  adminQueueRoutes
+);
 app.use(notFoundHandler);
 
 app.use(errorHandler);

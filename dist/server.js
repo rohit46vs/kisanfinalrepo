@@ -15,6 +15,7 @@ const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const rateLimit_1 = require("./middleware/rateLimit");
 const requestId_1 = require("./middleware/requestId");
 const errorHandler_1 = require("./middleware/errorHandler");
+const queue_routes_1 = __importDefault(require("./routes/queue.routes"));
 const app = (0, express_1.default)();
 const PORT = Number(process.env.PORT ?? 4000);
 app.disable("x-powered-by");
@@ -41,6 +42,7 @@ app.use("/api/test", test_routes_1.default);
 app.use("/api/centres", centre_routes_1.default);
 app.use("/api/slots", slot_routes_1.default);
 app.use("/api/bookings", booking_routes_1.default);
+app.use("/api/queue", queue_routes_1.default);
 app.use(errorHandler_1.notFoundHandler);
 app.use(errorHandler_1.errorHandler);
 app.listen(PORT, () => {
