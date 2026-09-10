@@ -4,6 +4,7 @@ exports.getAdminQueue = getAdminQueue;
 exports.markBookingWaiting = markBookingWaiting;
 exports.callFarmer = callFarmer;
 exports.markBookingGateEntered = markBookingGateEntered;
+exports.verifyAndEnterGateByQr = verifyAndEnterGateByQr;
 exports.startWeighing = startWeighing;
 exports.completeWeighing = completeWeighing;
 exports.completeQualityInspection = completeQualityInspection;
@@ -165,6 +166,123 @@ async function markBookingGateEntered(bookingId, performedBy) {
         throw error;
     }
     return data;
+}
+async function verifyAndEnterGateByQr(payload, performedBy) {
+    const { data: booking, error: bookingError, } = await supabase_1.supabaseAdmin
+        .from("bookings")
+        .select(`
+      id,
+      token_number,
+      status,
+      current_stage,
+      queue_position,
+      estimated_quantity_qtl,
+      actual_quantity_qtl,
+      booked_at,
+      arrived_at,
+      gate_pass_number,
+      qr_token,
+      slot_id,
+      slot:slots (
+        id,
+        centre_id,
+        slot_date,
+        start_time,
+        end_time,
+        centre:procurement_centres (
+          id,
+          centre_code,
+          name,
+          district,
+          state,
+          pincode,
+          is_active
+        )
+      ),
+      commodity:commodities (
+        id,
+        name,
+        code
+      )
+      `)
+        .eq("id", payload.booking_id)
+        .maybeSingle();
+    if (bookingError) {
+        throw bookingError;
+    }
+    if (!booking) {
+        throw new Error("BOOKING_NOT_FOUND");
+    }
+    if (!booking.qr_token) {
+        throw new Error("QR_NOT_CONFIGURED");
+    }
+    if (booking.qr_token !== payload.token) {
+        throw new Error("QR_TOKEN_MISMATCH");
+    }
+    if (booking.token_number !==
+        payload.token_number) {
+        throw new Error("TOKEN_NUMBER_MISMATCH");
+    }
+    if (booking.status === "cancelled") {
+        throw new Error("BOOKING_CANCELLED");
+    }
+    if (booking.status === "arrived" ||
+        booking.arrived_at) {
+        throw new Error("ALREADY_ENTERED");
+    }
+    if (booking.status !== "called") {
+        throw new Error("BOOKING_NOT_CALLED");
+    }
+    const slot = Array.isArray(booking.slot)
+        ? booking.slot[0]
+        : booking.slot;
+    if (!slot) {
+        throw new Error("BOOKING_SLOT_NOT_FOUND");
+    }
+    const centre = Array.isArray(slot.centre)
+        ? slot.centre[0]
+        : slot.centre;
+    if (!centre) {
+        throw new Error("BOOKING_CENTRE_NOT_FOUND");
+    }
+    if (!centre.is_active) {
+        throw new Error("CENTRE_INACTIVE");
+    }
+    const gateEntry = await markBookingGateEntered(payload.booking_id, performedBy);
+    return {
+        booking: {
+            id: booking.id,
+            token_number: booking.token_number,
+            status: booking.status,
+            current_stage: booking.current_stage,
+            queue_position: booking.queue_position,
+            estimated_quantity_qtl: booking.estimated_quantity_qtl,
+            actual_quantity_qtl: booking.actual_quantity_qtl,
+            booked_at: booking.booked_at,
+            arrived_at: booking.arrived_at,
+            gate_pass_number: booking.gate_pass_number,
+            slot: {
+                id: slot.id,
+                centre_id: slot.centre_id,
+                slot_date: slot.slot_date,
+                start_time: slot.start_time,
+                end_time: slot.end_time,
+                centre: {
+                    id: centre.id,
+                    centre_code: centre.centre_code,
+                    name: centre.name,
+                    district: centre.district,
+                    state: centre.state,
+                    pincode: centre.pincode,
+                },
+            },
+            commodity: Array.isArray(booking.commodity)
+                ? booking.commodity[0] ??
+                    null
+                : booking.commodity,
+        },
+        gate_entry: gateEntry,
+    };
 }
 async function startWeighing(bookingId, performedBy) {
     const { data, error } = await supabase_1.supabaseAdmin.rpc("start_weighing", {

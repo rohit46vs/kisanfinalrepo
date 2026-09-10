@@ -21,7 +21,7 @@ async function postBooking(req, res) {
         });
     }
     try {
-        const booking = await (0, booking_service_1.createBooking)(req.accessToken, parsed.data.slot_id, parsed.data.estimated_quantity_qtl);
+        const booking = await (0, booking_service_1.createBooking)(req.accessToken, parsed.data.slot_id, parsed.data.commodity_id, parsed.data.estimated_quantity_qtl);
         return res.status(201).json({
             success: true,
             data: booking,
@@ -60,6 +60,13 @@ async function postBooking(req, res) {
             return res.status(409).json({
                 success: false,
                 error: "This slot date has already passed",
+            });
+        }
+        if (message.includes("COMMODITY_NOT_FOUND") ||
+            message.includes("INVALID_COMMODITY")) {
+            return res.status(400).json({
+                success: false,
+                error: "Please select a valid crop type",
             });
         }
         if (message.includes("FARMER_ACCESS_REQUIRED") ||

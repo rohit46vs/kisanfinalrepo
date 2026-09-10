@@ -8,6 +8,7 @@ import {
   markBookingWaitingController,
   callFarmerController,
   markBookingGateEnteredController,
+  verifyQrAndEnterGateController,
   startWeighingController,
   completeWeighingController,
   completeQualityInspectionController,
@@ -40,6 +41,13 @@ router.post(
   requireAuth,
   requireRole(...adminRoles),
   callFarmerController
+);
+
+router.post(
+  "/verify-qr",
+  requireAuth,
+  requireRole(...adminRoles),
+  verifyQrAndEnterGateController
 );
 
 router.post(

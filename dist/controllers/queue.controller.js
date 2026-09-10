@@ -10,16 +10,17 @@ async function getMyQueueController(req, res) {
         });
     }
     try {
-        const queue = await (0, queue_service_1.getMyQueueStatus)(req.userId);
-        if (!queue) {
-            return res.status(404).json({
-                success: false,
-                error: "No active booking found",
+        const queues = await (0, queue_service_1.getMyQueueStatus)(req.userId);
+        if (!queues || queues.length === 0) {
+            return res.status(200).json({
+                success: true,
+                data: [],
+                message: "No active bookings found",
             });
         }
         return res.status(200).json({
             success: true,
-            data: queue,
+            data: queues,
         });
     }
     catch (error) {
