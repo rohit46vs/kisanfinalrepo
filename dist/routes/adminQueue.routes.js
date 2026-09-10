@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../middleware/auth");
+const roles_1 = require("../middleware/roles");
+const adminQueue_controller_1 = require("../controllers/adminQueue.controller");
+const router = (0, express_1.Router)();
+router.get("/", auth_1.requireAuth, (0, roles_1.requireRole)("procurement_officer", "super_admin"), adminQueue_controller_1.getAdminQueueController);
+router.post("/:id/waiting", auth_1.requireAuth, (0, roles_1.requireRole)("procurement_officer", "super_admin"), adminQueue_controller_1.markBookingWaitingController);
+router.post("/:id/call", auth_1.requireAuth, (0, roles_1.requireRole)("procurement_officer", "super_admin"), adminQueue_controller_1.callFarmerController);
+router.post("/:id/gate-entry", auth_1.requireAuth, (0, roles_1.requireRole)("procurement_officer", "super_admin"), adminQueue_controller_1.markBookingGateEnteredController);
+exports.default = router;
