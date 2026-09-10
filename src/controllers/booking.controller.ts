@@ -18,7 +18,9 @@ export async function postBooking(
     });
   }
 
-  const parsed = createBookingSchema.safeParse(req.body);
+  const parsed = createBookingSchema.safeParse(
+    req.body
+  );
 
   if (!parsed.success) {
     return res.status(400).json({
@@ -32,6 +34,7 @@ export async function postBooking(
     const booking = await createBooking(
       req.accessToken,
       parsed.data.slot_id,
+      parsed.data.commodity_id,
       parsed.data.estimated_quantity_qtl
     );
 
@@ -81,6 +84,16 @@ export async function postBooking(
         success: false,
         error:
           "This slot date has already passed",
+      });
+    }
+
+    if (
+      message.includes("COMMODITY_NOT_FOUND") ||
+      message.includes("INVALID_COMMODITY")
+    ) {
+      return res.status(400).json({
+        success: false,
+        error: "Please select a valid crop type",
       });
     }
 
@@ -155,15 +168,15 @@ export async function getBookingByIdController(
   }
 
   const bookingId = Array.isArray(req.params.id)
-  ? req.params.id[0]
-  : req.params.id;
+    ? req.params.id[0]
+    : req.params.id;
 
-if (!bookingId) {
-  return res.status(400).json({
-    success: false,
-    error: "Booking ID is required",
-  });
-}
+  if (!bookingId) {
+    return res.status(400).json({
+      success: false,
+      error: "Booking ID is required",
+    });
+  }
 
   try {
     const booking = await getBookingById(

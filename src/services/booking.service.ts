@@ -3,18 +3,19 @@ import { createUserSupabaseClient } from "../config/supabaseUser";
 export async function createBooking(
   accessToken: string,
   slotId: string,
-  estimatedQuantityQtl?: number
+  commodityId: string,
+  estimatedQuantityQtl: number
 ) {
-  const supabase = createUserSupabaseClient(
-    accessToken
-  );
+  const supabase =
+    createUserSupabaseClient(accessToken);
 
   const { data, error } = await supabase.rpc(
     "book_slot_v2",
     {
       p_slot_id: slotId,
+      p_commodity_id: commodityId,
       p_estimated_quantity_qtl:
-        estimatedQuantityQtl ?? null,
+        estimatedQuantityQtl,
     }
   );
 
@@ -39,11 +40,16 @@ export async function getMyBooking(
       token_number,
       status,
       booked_at,
+      commodity_id,
       estimated_quantity_qtl,
       qr_token,
       gate_pass_number,
       queue_position,
       current_stage,
+      commodity:commodities (
+        id,
+        name
+      ),
       slot:slots (
         id,
         slot_date,
@@ -98,11 +104,16 @@ export async function getBookingById(
       token_number,
       status,
       booked_at,
+      commodity_id,
       estimated_quantity_qtl,
       qr_token,
       gate_pass_number,
       queue_position,
       current_stage,
+      commodity:commodities (
+        id,
+        name
+      ),
       slot:slots (
         id,
         slot_date,

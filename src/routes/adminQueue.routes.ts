@@ -9,6 +9,9 @@ import {
   callFarmerController,
   markBookingGateEnteredController,
   startWeighingController,
+  completeWeighingController,
+  completeQualityInspectionController,
+  completeBaggingController,
 } from "../controllers/adminQueue.controller";
 
 const router = Router();
@@ -51,6 +54,27 @@ router.post(
   requireAuth,
   requireRole(...adminRoles),
   startWeighingController
+);
+
+router.post(
+  "/:id/complete-weighing",
+  requireAuth,
+  requireRole(...adminRoles),
+  completeWeighingController
+);
+
+router.post(
+  "/:id/complete-quality",
+  requireAuth,
+  requireRole(...adminRoles),
+  completeQualityInspectionController
+);
+
+router.post(
+  "/:id/complete-bagging",
+  requireAuth,
+  requireRole(...adminRoles),
+  completeBaggingController
 );
 
 export default router;
