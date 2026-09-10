@@ -37,18 +37,27 @@ export async function getMyBooking(
     .select(
       `
       id,
+      farmer_id,
+      slot_id,
       token_number,
       status,
       booked_at,
+      arrived_at,
+      completed_at,
+      updated_at,
       commodity_id,
       estimated_quantity_qtl,
+      actual_quantity_qtl,
       qr_token,
       gate_pass_number,
       queue_position,
       current_stage,
       commodity:commodities (
         id,
-        name
+        name,
+        code,
+        category,
+        storage_requirement
       ),
       slot:slots (
         id,
@@ -67,26 +76,15 @@ export async function getMyBooking(
       )
       `
     )
-    .in("status", [
-      "booked",
-      "waiting",
-      "called",
-      "arrived",
-      "inspected",
-      "accepted",
-      "payment",
-    ])
     .order("booked_at", {
       ascending: false,
-    })
-    .limit(1)
-    .maybeSingle();
+    });
 
   if (error) {
     throw error;
   }
 
-  return data;
+  return data ?? [];
 }
 
 export async function getBookingById(
@@ -101,18 +99,27 @@ export async function getBookingById(
     .select(
       `
       id,
+      farmer_id,
+      slot_id,
       token_number,
       status,
       booked_at,
+      arrived_at,
+      completed_at,
+      updated_at,
       commodity_id,
       estimated_quantity_qtl,
+      actual_quantity_qtl,
       qr_token,
       gate_pass_number,
       queue_position,
       current_stage,
       commodity:commodities (
         id,
-        name
+        name,
+        code,
+        category,
+        storage_requirement
       ),
       slot:slots (
         id,

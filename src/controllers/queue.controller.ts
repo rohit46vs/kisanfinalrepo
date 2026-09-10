@@ -14,20 +14,21 @@ export async function getMyQueueController(
   }
 
   try {
-    const queue = await getMyQueueStatus(
+    const queues = await getMyQueueStatus(
       req.userId
     );
 
-    if (!queue) {
-      return res.status(404).json({
-        success: false,
-        error: "No active booking found",
+    if (!queues || queues.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "No active bookings found",
       });
     }
 
     return res.status(200).json({
       success: true,
-      data: queue,
+      data: queues,
     });
   } catch (error) {
     console.error(
