@@ -62,11 +62,29 @@ async function postBooking(req, res) {
                 error: "This slot date has already passed",
             });
         }
+        if (message.includes("PRICE_NOT_CONFIGURED")) {
+            return res.status(409).json({
+                success: false,
+                error: "A procurement price is not configured for this crop in your state yet.",
+            });
+        }
+        if (message.includes("FARMER_STATE_REQUIRED")) {
+            return res.status(400).json({
+                success: false,
+                error: "Please complete your state information before booking a slot.",
+            });
+        }
         if (message.includes("COMMODITY_NOT_FOUND") ||
             message.includes("INVALID_COMMODITY")) {
             return res.status(400).json({
                 success: false,
                 error: "Please select a valid crop type",
+            });
+        }
+        if (message.includes("INVALID_ESTIMATED_QUANTITY")) {
+            return res.status(400).json({
+                success: false,
+                error: "Please enter a valid estimated quantity between 0 and 1000 QTL.",
             });
         }
         if (message.includes("FARMER_ACCESS_REQUIRED") ||
