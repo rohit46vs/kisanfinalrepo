@@ -12,18 +12,22 @@ const centre_routes_1 = __importDefault(require("./routes/centre.routes"));
 const slot_routes_1 = __importDefault(require("./routes/slot.routes"));
 const booking_routes_1 = __importDefault(require("./routes/booking.routes"));
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
+const queue_routes_1 = __importDefault(require("./routes/queue.routes"));
+const adminQueue_routes_1 = __importDefault(require("./routes/adminQueue.routes"));
+const payment_routes_1 = __importDefault(require("./routes/payment.routes"));
 const rateLimit_1 = require("./middleware/rateLimit");
 const requestId_1 = require("./middleware/requestId");
 const errorHandler_1 = require("./middleware/errorHandler");
-const queue_routes_1 = __importDefault(require("./routes/queue.routes"));
-const adminQueue_routes_1 = __importDefault(require("./routes/adminQueue.routes"));
 const app = (0, express_1.default)();
 const PORT = Number(process.env.PORT ?? 4000);
 app.disable("x-powered-by");
 app.use((0, helmet_1.default)());
 app.use(requestId_1.requestId);
 app.use((0, cors_1.default)({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: [
+        "http://localhost:3000",
+        "http://localhost:3001",
+    ],
     credentials: true,
 }));
 app.use(express_1.default.json({
@@ -45,6 +49,7 @@ app.use("/api/slots", slot_routes_1.default);
 app.use("/api/bookings", booking_routes_1.default);
 app.use("/api/queue", queue_routes_1.default);
 app.use("/api/admin/queue", adminQueue_routes_1.default);
+app.use("/api/payments", payment_routes_1.default);
 app.use(errorHandler_1.notFoundHandler);
 app.use(errorHandler_1.errorHandler);
 app.listen(PORT, () => {
